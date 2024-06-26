@@ -6,45 +6,87 @@
     <title>链接缩短器</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .link-item {
             display: flex;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            align-items: center;
         }
         .link-item input {
             flex: 1;
             margin-right: 10px;
-            padding: 5px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
         }
         button {
-            padding: 5px 10px;
-            background-color: #4CAF50;
+            padding: 10px 15px;
+            background-color: #3498db;
             color: white;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
         }
         .copyright {
-            margin-top: 20px;
+            margin-top: 30px;
             text-align: center;
+            font-size: 14px;
+            color: #7f8c8d;
         }
         .copyright a {
             text-decoration: none;
             font-weight: bold;
-            color: unset;
-            transition: opacity 0.2s;
+            color: #3498db;
+            transition: color 0.3s;
         }
         .copyright a:hover {
-            opacity: 0.5;
+            color: #2980b9;
         }
         #linksList {
             margin-bottom: 20px;
+        }
+        #loginSection, #linksSection {
+            margin-bottom: 20px;
+        }
+        #passwordInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        #saveButton {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            background-color: #2ecc71;
+        }
+        #saveButton:hover {
+            background-color: #27ae60;
         }
     </style>
 </head>
