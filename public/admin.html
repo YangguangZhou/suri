@@ -12,6 +12,7 @@
             margin: 0;
             padding: 0;
             color: #333;
+            box-sizing: border-box;
         }
         .container {
             width: 90%;
@@ -19,9 +20,10 @@
             margin: 2rem auto;
             padding: 2rem;
             border: 1px solid #e0e0e0;
-            border-radius: 12px;
+            border-radius: 8px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             background-color: #fff;
+            box-sizing: border-box;
         }
         h1 {
             color: #333;
@@ -45,13 +47,16 @@
             font-size: 1rem;
             transition: border-color 0.3s ease;
             box-sizing: border-box;
+            background-color: #f9f9f9;
         }
         input:focus {
             outline: none;
             border-color: #279cff;
+            background-color: #fff;
         }
         button {
-            padding: 0.75rem 1.5rem;
+            width: 100%;
+            padding: 0.75rem;
             background-color: #279cff;
             color: white;
             border: none;
@@ -59,6 +64,7 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.3s ease;
+            margin-top: 0.5rem;
         }
         button:hover {
             background-color: #2180d8;
@@ -73,7 +79,9 @@
             margin-right: 0.5rem;
         }
         .link-item button {
-            padding: 0.5rem;
+            width: auto;
+            padding: 0.5rem 1rem;
+            margin-top: 0;
             background-color: #ff4d4d;
         }
         .link-item button:hover {
@@ -114,8 +122,7 @@
         </div>
         <div id="linksSection" style="display: none;">
             <div id="linksList"></div>
-            <button onclick="addLink()">添加链接</button>
-            <button onclick="saveLinks()">保存所有链接</button>
+            <button onclick="addLink()">新增链接</button>
         </div>
         <div id="errorMessage" class="error-message"></div>
     </div>
@@ -157,7 +164,7 @@
         async function fetchLinks() {
             try {
                 const response = await axios.get(
-                    `https://cdn.jerryz.com.cn/gh/$${repoOwner}/$${repoName}@master/$${filePath}`
+                    `https://cdn.jerryz.com.cn/gh/${repoOwner}/${repoName}@master/${filePath}`
                 );
                 links = response.data;
                 displayLinks();
@@ -173,10 +180,11 @@
             for (const [shortUrl, link] of Object.entries(links)) {
                 const linkItem = document.createElement('div');
                 linkItem.className = 'link-item';
+                linkItem.dataset.shortUrl = shortUrl;
                 linkItem.innerHTML = `
-                    <input value="$${shortUrl}" onchange="updateShortUrl('$${shortUrl}', this.value)" placeholder="短链接">
-                    <input value="$${link}" onchange="updateLink('$${shortUrl}', this.value)" placeholder="链接">
-                    <button onclick="removeLink('$${shortUrl}')"><i class="fas fa-trash"></i></button>
+                    <input value="${shortUrl}" onchange="updateShortUrl('${shortUrl}', this.value)" placeholder="新短链接">
+                    <input value="${link}" onchange="updateLink('${shortUrl}', this.value)" placeholder="新链接">
+                    <button onclick="removeLink('${shortUrl}')"><i class="fas fa-trash"></i></button>
                 `;
                 linksList.appendChild(linkItem);
             }
@@ -185,12 +193,26 @@
         function addLink() {
             const linkItem = document.createElement('div');
             linkItem.className = 'link-item';
+            linkItem.dataset.shortUrl = 'new';
             linkItem.innerHTML = `
-                <input placeholder="短链接" onchange="updateShortUrl('', this.value)">
-                <input placeholder="链接" onchange="updateLink('', this.value)">
-                <button onclick="removeLink('')"><i class="fas fa-trash"></i></button>
+                <input placeholder="新短链接" onchange="updateNewLink(this, 'shortUrl')">
+                <input placeholder="新链接" onchange="updateNewLink(this, 'link')">
+                <button onclick="removeNewLink(this)"><i class="fas fa-trash"></i></button>
             `;
             document.getElementById('linksList').appendChild(linkItem);
+        }
+
+        function updateNewLink(inputElement, type) {
+            const linkItem = inputElement.parentNode;
+            const shortUrlInput = linkItem.querySelector('input[placeholder="新短链接"]');
+            const linkInput = linkItem.querySelector('input[placeholder="新链接"]');
+            const shortUrl = shortUrlInput.value;
+            const link = linkInput.value;
+
+            if (shortUrl && link) {
+                links[shortUrl] = link;
+                displayLinks();
+            }
         }
 
         function updateShortUrl(oldShortUrl, newShortUrl) {
@@ -210,15 +232,20 @@
             displayLinks();
         }
 
+        function removeNewLink(buttonElement) {
+            const linkItem = buttonElement.parentNode;
+            linkItem.parentNode.removeChild(linkItem);
+        }
+
         async function saveLinks() {
             try {
                 const content = btoa(JSON.stringify(links, null, 2));
-                const response = await axios.put(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
+                const response = await axios.put(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
                     message: 'Update links',
                     content: content,
                     sha: await getCurrentFileSHA()
                 }, {
-                    headers: { 'Authorization': `token $${githubToken}` }
+                    headers: { 'Authorization': `token ${githubToken}` }
                 });
 
                 if (response.status === 200) {
@@ -234,8 +261,8 @@
 
         async function getCurrentFileSHA() {
             try {
-                const response = await axios.get(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
-                    headers: { 'Authorization': `token $${githubToken}` }
+                const response = await axios.get(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
+                    headers: { 'Authorization': `token ${githubToken}` }
                 });
                 return response.data.sha;
             } catch (error) {
