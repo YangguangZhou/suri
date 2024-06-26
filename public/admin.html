@@ -5,114 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>链接缩短器</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 0;
-        color: #333;
-    }
-    .container {
-        width: 100%;
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 2rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
-    }
-    h1 {
-        color: #333;
-        margin-bottom: 1.5rem;
-        text-align: center;
-    }
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-        color: #555;
-    }
-    input {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 1rem;
-        transition: border-color 0.3s ease;
-        box-sizing: border-box;
-    }
-    input:focus {
-        outline: none;
-        border-color: #279cff;
-    }
-    button {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: #279cff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background-color 0.3s ease;
-        margin-top: 0.5rem;
-    }
-    button:hover {
-        background-color: #2180d8;
-    }
-    .link-item {
-        display: flex;
-        margin-bottom: 1rem;
-        align-items: center;
-    }
-    .link-item input {
-        flex: 1;
-        margin-right: 0.5rem;
-    }
-    .link-item button {
-        width: auto;
-        padding: 0.5rem 1rem;
-        margin-top: 0;
-        background-color: #ff4d4d;
-    }
-    .link-item button:hover {
-        background-color: #e60000;
-    }
-    #linksList {
-        margin-bottom: 1.5rem;
-    }
-    .copyright {
-        text-align: center;
-        margin: 2rem 0 1rem 0;
-        color: #999;
-        font-size: 14px;
-    }
-    .copyright a {
-        text-decoration: none;
-        font-weight: bold;
-        color: #999;
-        transition: opacity 0.2s;
-    }
-    .copyright a:hover {
-        opacity: 0.5;
-    }
-    .error-message {
-        color: red;
-        margin-top: 1rem;
-        text-align: center;
-    }
-    @media (max-width: 768px) {
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
         .container {
             width: 95%;
-            padding: 1.5rem;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
         }
-    }
-</style>
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #279cff;
+        }
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #279cff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        button:hover {
+            background-color: #2180d8;
+        }
+        .link-item {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        .link-item input {
+            flex: 1;
+            margin-right: 0.5rem;
+        }
+        .link-item button {
+            width: auto;
+            padding: 0.5rem 1rem;
+            margin-top: 0;
+            background-color: #ff4d4d;
+        }
+        .link-item button:hover {
+            background-color: #e60000;
+        }
+        #linksList {
+            margin-bottom: 1.5rem;
+        }
+        .copyright {
+            text-align: center;
+            margin: 2rem 0 1rem 0;
+            color: #999;
+            font-size: 14px;
+        }
+        .copyright a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #999;
+            transition: opacity 0.2s;
+        }
+        .copyright a:hover {
+            opacity: 0.5;
+        }
+        .error-message {
+            color: red;
+            margin-top: 1rem;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -175,13 +169,13 @@
         async function fetchLinks() {
             try {
                 const response = await axios.get(
-                    `https://cdn.jerryz.com.cn/gh/$${repoOwner}/$${repoName}@master/$${filePath}`
+                    `https://cdn.jerryz.com.cn/gh/${repoOwner}/${repoName}@master/${filePath}`
                 );
                 links = response.data;
                 displayLinks();
             } catch (error) {
                 console.error('Failed to fetch links:', error);
-                showError('获取链接失败，请重试' + error);
+                showError('获取链接失败，请重试: ' + error.message);
             }
         }
 
@@ -192,9 +186,9 @@
                 const linkItem = document.createElement('div');
                 linkItem.className = 'link-item';
                 linkItem.innerHTML = `
-                    <input value="$${shortUrl}" onchange="updateShortUrl('$${shortUrl}', this.value)">
-                    <input value="$${link}" onchange="updateLink('$${shortUrl}', this.value)">
-                    <button onclick="removeLink('$${shortUrl}')"><i class="fas fa-trash"></i></button>
+                    <input value="${shortUrl}" onchange="updateShortUrl('${shortUrl}', this.value)">
+                    <input value="${link}" onchange="updateLink('${shortUrl}', this.value)">
+                    <button onclick="removeLink('${shortUrl}')"><i class="fas fa-trash"></i></button>
                 `;
                 linksList.appendChild(linkItem);
             }
@@ -233,12 +227,12 @@
         async function saveLinks() {
             try {
                 const content = btoa(JSON.stringify(links, null, 2));
-                const response = await axios.put(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
+                const response = await axios.put(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
                     message: 'Update links',
                     content: content,
                     sha: await getCurrentFileSHA()
                 }, {
-                    headers: { 'Authorization': `token $${githubToken}` }
+                    headers: { 'Authorization': `token ${githubToken}` }
                 });
 
                 if (response.status === 200) {
@@ -248,14 +242,14 @@
                 }
             } catch (error) {
                 console.error('Failed to save links:', error);
-                showError('保存链接失败，请重试');
+                showError('保存链接失败，请重试: ' + error.message);
             }
         }
 
         async function getCurrentFileSHA() {
             try {
-                const response = await axios.get(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
-                    headers: { 'Authorization': `token $${githubToken}` }
+                const response = await axios.get(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
+                    headers: { 'Authorization': `token ${githubToken}` }
                 });
                 return response.data.sha;
             } catch (error) {
@@ -267,9 +261,6 @@
         function showError(message) {
             const errorElement = document.getElementById('errorMessage');
             errorElement.textContent = message;
-            setTimeout(() => {
-                errorElement.textContent = '';
-            }, 3000);
         }
 
         // 页面加载时检查认证状态
