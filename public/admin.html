@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>链接缩短器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             margin: 0;
             padding: 0;
+            color: #333;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 2rem auto;
             padding: 2rem;
             border: 1px solid #e0e0e0;
@@ -27,6 +29,12 @@
         }
         .form-group {
             margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
         }
         input {
             width: 100%;
@@ -58,6 +66,7 @@
         .link-item {
             display: flex;
             margin-bottom: 1rem;
+            align-items: center;
         }
         .link-item input {
             flex: 1;
@@ -66,6 +75,10 @@
         .link-item button {
             width: auto;
             padding: 0.5rem 1rem;
+            background-color: #ff4d4d;
+        }
+        .link-item button:hover {
+            background-color: #e60000;
         }
         #linksList {
             margin-bottom: 1.5rem;
@@ -85,64 +98,84 @@
         .copyright a:hover {
             opacity: 0.5;
         }
+        .error-message {
+            color: red;
+            margin-top: 1rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>链接缩短器</h1>
         <div id="loginSection" class="form-group">
-            <input type="password" id="passwordInput" placeholder="请输入密码">
+            <label for="passwordInput">请输入密码</label>
+            <input type="password" id="passwordInput" placeholder="输入密码">
             <button onclick="authenticate()">登录</button>
         </div>
         <div id="linksSection" style="display: none;">
             <div id="linksList"></div>
             <div class="form-group">
-                <input id="newShortUrl" placeholder="新短链接">
-                <input id="newLink" placeholder="新链接">
-                <button onclick="addLink()">添加</button>
+                <label for="newShortUrl">新短链接</label>
+                <input id="newShortUrl" placeholder="输入新短链接">
             </div>
-            <button onclick="saveLinks()">保存</button>
+            <div class="form-group">
+                <label for="newLink">新链接</label>
+                <input id="newLink" placeholder="输入新链接">
+            </div>
+            <button onclick="addLink()">添加链接</button>
+            <button onclick="saveLinks()">保存所有链接</button>
         </div>
+        <div id="errorMessage" class="error-message"></div>
     </div>
     <div class="copyright">
         Copyright &copy; 2023-2024
         <a href="https://jerryz.com.cn" target="_blank">Jerry Zhou</a>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
         let links = {};
         const githubToken = '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';
         const repoOwner = 'YangguangZhou';
         const repoName = 'suri';
         const filePath = 'src/links.json';
-        const password = '080506Jerry'
+        const password = '080506Jerry';
         let currentSHA = '';
+
+        function checkAuth() {
+            const authStatus = localStorage.getItem('authStatus');
+            if (authStatus === 'true') {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('linksSection').style.display = 'block';
+                fetchLinks();
+            }
+        }
 
         function authenticate() {
             const passwordInput = document.getElementById('passwordInput').value;
             if (passwordInput === password) {
+                localStorage.setItem('authStatus', 'true');
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('linksSection').style.display = 'block';
                 fetchLinks();
             } else {
-                alert('密码错误');
+                showError('密码错误');
             }
         }
 
-        function fetchLinks() {
-            fetch(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
-                headers: { 'Authorization': `token $${githubToken}` }
-            })
-            .then(response => response.json())
-            .then(data => {
-                currentSHA = data.sha;
-                links = JSON.parse(atob(data.content));
+        async function fetchLinks() {
+            try {
+                const response = await axios.get(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
+                    headers: { 'Authorization': `token $${githubToken}` }
+                });
+                currentSHA = response.data.sha;
+                links = JSON.parse(atob(response.data.content));
                 displayLinks();
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Failed to fetch links:', error);
-                alert('获取链接失败，请重试');
-            });
+                showError('获取链接失败，请重试');
+            }
         }
 
         function displayLinks() {
@@ -154,7 +187,7 @@
                 linkItem.innerHTML = `
                     <input value="$${shortUrl}" onchange="updateShortUrl('$${shortUrl}', this.value)">
                     <input value="$${link}" onchange="updateLink('$${shortUrl}', this.value)">
-                    <button onclick="removeLink('$${shortUrl}')">删除</button>
+                    <button onclick="removeLink('$${shortUrl}')"><i class="fas fa-trash"></i></button>
                 `;
                 linksList.appendChild(linkItem);
             }
@@ -168,6 +201,8 @@
                 displayLinks();
                 document.getElementById('newShortUrl').value = '';
                 document.getElementById('newLink').value = '';
+            } else {
+                showError('请输入短链接和链接');
             }
         }
 
@@ -188,34 +223,39 @@
             displayLinks();
         }
 
-        function saveLinks() {
-            const content = btoa(JSON.stringify(links, null, 2));
-            fetch(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${githubToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+        async function saveLinks() {
+            try {
+                const content = btoa(JSON.stringify(links, null, 2));
+                const response = await axios.put(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
                     message: 'Update links',
                     content: content,
                     sha: currentSHA
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.content) {
+                }, {
+                    headers: { 'Authorization': `token ${githubToken}` }
+                });
+
+                if (response.status === 200) {
                     alert('链接已保存到GitHub');
-                    currentSHA = data.content.sha;
+                    currentSHA = response.data.content.sha;
                 } else {
                     throw new Error('Failed to save links');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Failed to save links:', error);
-                alert('保存链接失败，请重试');
-            });
+                showError('保存链接失败，请重试');
+            }
         }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            setTimeout(() => {
+                errorElement.textContent = '';
+            }, 3000);
+        }
+
+        // 页面加载时检查认证状态
+        window.onload = checkAuth;
     </script>
 </body>
 </html>
