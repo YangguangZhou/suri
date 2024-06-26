@@ -37,8 +37,7 @@
             background-color: #fff;
             box-sizing: border-box;
             flex: 1;
-            max-height: 80vh; /* 新增，限制最大高度 */
-            overflow-y: auto; /* 新增，启用滚动条 */
+            overflow: hidden;
         }
 
         h1 {
@@ -79,6 +78,7 @@
 
         button {
             width: 100%;
+            max-width: 200px;
             padding: 0.75rem;
             background-color: var(--primary-color);
             color: white;
@@ -179,6 +179,7 @@
         <div id="linksSection" style="display: none;">
             <div id="linksList"></div>
             <button onclick="addLink()">新增链接</button>
+            <button onclick="saveLinks()">保存链接</button>
         </div>
         <div id="errorMessage" class="error-message"></div>
     </div>
