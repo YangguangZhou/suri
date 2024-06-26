@@ -6,104 +6,103 @@
     <title>链接缩短器</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f0f0f0;
-            color: #333;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
         }
         .container {
-            background-color: white;
-            padding: 30px;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
         }
-        .link-item {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: center;
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
-        .link-item input {
-            flex: 1;
-            margin-right: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #279cff;
         }
         button {
-            padding: 10px 15px;
-            background-color: #3498db;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #279cff;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            margin-bottom: 0.5rem;
         }
         button:hover {
-            background-color: #2980b9;
+            background-color: #2180d8;
+        }
+        .link-item {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .link-item input {
+            flex: 1;
+            margin-right: 0.5rem;
+        }
+        .link-item button {
+            width: auto;
+            padding: 0.5rem 1rem;
+        }
+        #linksList {
+            margin-bottom: 1.5rem;
         }
         .copyright {
-            margin-top: 30px;
             text-align: center;
+            margin: 2rem 0 1rem 0;
+            color: #999;
             font-size: 14px;
-            color: #7f8c8d;
         }
         .copyright a {
             text-decoration: none;
             font-weight: bold;
-            color: #3498db;
-            transition: color 0.3s;
+            color: #999;
+            transition: opacity 0.2s;
         }
         .copyright a:hover {
-            color: #2980b9;
-        }
-        #linksList {
-            margin-bottom: 20px;
-        }
-        #loginSection, #linksSection {
-            margin-bottom: 20px;
-        }
-        #passwordInput {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        #saveButton {
-            display: block;
-            width: 100%;
-            margin-top: 20px;
-            background-color: #2ecc71;
-        }
-        #saveButton:hover {
-            background-color: #27ae60;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
-    <h1>链接缩短器</h1>
-    <div id="loginSection">
-        <input type="password" id="passwordInput" placeholder="请输入密码">
-        <button onclick="authenticate()">登录</button>
-    </div>
-    <div id="linksSection" style="display: none;">
-        <div id="linksList"></div>
-        <div class="link-item">
-            <input id="newShortUrl" placeholder="新短链接">
-            <input id="newLink" placeholder="新链接">
-            <button onclick="addLink()">添加</button>
+    <div class="container">
+        <h1>链接缩短器</h1>
+        <div id="loginSection" class="form-group">
+            <input type="password" id="passwordInput" placeholder="请输入密码">
+            <button onclick="authenticate()">登录</button>
         </div>
-        <button onclick="saveLinks()">保存</button>
+        <div id="linksSection" style="display: none;">
+            <div id="linksList"></div>
+            <div class="form-group">
+                <input id="newShortUrl" placeholder="新短链接">
+                <input id="newLink" placeholder="新链接">
+                <button onclick="addLink()">添加</button>
+            </div>
+            <button onclick="saveLinks()">保存</button>
+        </div>
     </div>
     <div class="copyright">
         Copyright &copy; 2023-2024
