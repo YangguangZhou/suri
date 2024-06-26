@@ -78,7 +78,7 @@
         }
 
         button {
-            width: 300px;
+            width: 100%;
             padding: 0.75rem;
             background-color: var(--primary-color);
             color: white;
@@ -166,12 +166,18 @@
                 font-size: 2rem;
             }
         }
-        @media screen and (min-width: 680px) {
-    button {
-        width: auto; /* 或设置为固定的更小的宽度，如200px */
+       @media screen and (min-width: 680px) {
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button-container button {
+        width: 300px;
+        margin-bottom: 10px;
     }
 }
-
     </style>
 </head>
 <body>
@@ -183,11 +189,12 @@
             <button onclick="authenticate()">登录</button>
         </div>
         <div id="linksSection" style="display: none;">
-            <div id="linksList"></div>
-            <button onclick="addLink()">新增链接</button></br>
-            <button onclick="saveLinks()">保存链接</button>
-
-        </div>
+    <div id="linksList"></div>
+    <div class="button-container">
+        <button onclick="addLink()">新增链接</button>
+        <button onclick="saveLinks()">保存链接</button>
+    </div>
+</div>
         <div id="errorMessage" class="error-message"></div>
     </div>
     <div class="copyright">
