@@ -181,7 +181,7 @@
                 displayLinks();
             } catch (error) {
                 console.error('Failed to fetch links:', error);
-                showError('获取链接失败，请重试');
+                showError('获取链接失败，请重试' + error);
             }
         }
 
