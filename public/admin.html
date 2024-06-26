@@ -14,7 +14,7 @@
             color: #333;
         }
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 2rem auto;
             padding: 2rem;
             border: 1px solid #e0e0e0;
@@ -37,7 +37,7 @@
             color: #555;
         }
         input {
-            width: 100%;
+            width: calc(100% - 1.5rem);
             padding: 0.75rem;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -58,7 +58,7 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.3s ease;
-            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
         }
         button:hover {
             background-color: #2180d8;
@@ -75,6 +75,7 @@
         .link-item button {
             width: auto;
             padding: 0.5rem 1rem;
+            margin-top: 0;
             background-color: #ff4d4d;
         }
         .link-item button:hover {
@@ -141,7 +142,6 @@
         const repoName = 'suri';
         const filePath = 'src/links.json';
         const password = '080506Jerry';
-        let currentSHA = '';
 
         function checkAuth() {
             const authStatus = localStorage.getItem('authStatus');
@@ -166,11 +166,10 @@
 
         async function fetchLinks() {
             try {
-                const response = await axios.get(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
-                    headers: { 'Authorization': `token $${githubToken}` }
-                });
-                currentSHA = response.data.sha;
-                links = JSON.parse(atob(response.data.content));
+                const response = await axios.get(
+                    `https://cdn.jerryz.com.cn/gh/$${repoOwner}/$${repoName}@main/$${filePath}`
+                );
+                links = response.data;
                 displayLinks();
             } catch (error) {
                 console.error('Failed to fetch links:', error);
@@ -229,20 +228,31 @@
                 const response = await axios.put(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
                     message: 'Update links',
                     content: content,
-                    sha: currentSHA
+                    sha: await getCurrentFileSHA()
                 }, {
-                    headers: { 'Authorization': `token ${githubToken}` }
+                    headers: { 'Authorization': `token $${githubToken}` }
                 });
 
                 if (response.status === 200) {
                     alert('链接已保存到GitHub');
-                    currentSHA = response.data.content.sha;
                 } else {
                     throw new Error('Failed to save links');
                 }
             } catch (error) {
                 console.error('Failed to save links:', error);
                 showError('保存链接失败，请重试');
+            }
+        }
+
+        async function getCurrentFileSHA() {
+            try {
+                const response = await axios.get(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
+                    headers: { 'Authorization': `token $${githubToken}` }
+                });
+                return response.data.sha;
+            } catch (error) {
+                console.error('Failed to get current file SHA:', error);
+                throw error;
             }
         }
 
