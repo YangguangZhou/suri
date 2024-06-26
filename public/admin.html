@@ -19,7 +19,7 @@
             margin: 2rem auto;
             padding: 2rem;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 12px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             background-color: #fff;
         }
@@ -45,16 +45,13 @@
             font-size: 1rem;
             transition: border-color 0.3s ease;
             box-sizing: border-box;
-            background-color: #f9f9f9;
         }
         input:focus {
             outline: none;
             border-color: #279cff;
-            background-color: #fff;
         }
         button {
-            width: 100%;
-            padding: 0.75rem;
+            padding: 0.75rem 1.5rem;
             background-color: #279cff;
             color: white;
             border: none;
@@ -62,7 +59,6 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.3s ease;
-            margin-top: 0.5rem;
         }
         button:hover {
             background-color: #2180d8;
@@ -77,9 +73,7 @@
             margin-right: 0.5rem;
         }
         .link-item button {
-            width: auto;
-            padding: 0.5rem 1rem;
-            margin-top: 0;
+            padding: 0.5rem;
             background-color: #ff4d4d;
         }
         .link-item button:hover {
@@ -120,7 +114,8 @@
         </div>
         <div id="linksSection" style="display: none;">
             <div id="linksList"></div>
-            <button onclick="addLink()">新增链接</button>
+            <button onclick="addLink()">添加链接</button>
+            <button onclick="saveLinks()">保存所有链接</button>
         </div>
         <div id="errorMessage" class="error-message"></div>
     </div>
@@ -133,141 +128,129 @@
     <script>
         let links = {};
         const githubToken = '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';
-const repoOwner = 'YangguangZhou';
-const repoName = 'suri';
-const filePath = 'src/links.json';
-const password = '080506Jerry';
-    function checkAuth() {
-        const authStatus = localStorage.getItem('authStatus');
-        if (authStatus === 'true') {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('linksSection').style.display = 'block';
-            fetchLinks();
-        }
-    }
+        const repoOwner = 'YangguangZhou';
+        const repoName = 'suri';
+        const filePath = 'src/links.json';
+        const password = '080506Jerry';
 
-    function authenticate() {
-        const passwordInput = document.getElementById('passwordInput').value;
-        if (passwordInput === password) {
-            localStorage.setItem('authStatus', 'true');
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('linksSection').style.display = 'block';
-            fetchLinks();
-        } else {
-            showError('密码错误');
+        function checkAuth() {
+            const authStatus = localStorage.getItem('authStatus');
+            if (authStatus === 'true') {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('linksSection').style.display = 'block';
+                fetchLinks();
+            }
         }
-    }
 
-    async function fetchLinks() {
-        try {
-            const response = await axios.get(
-                `https://cdn.jerryz.com.cn/gh/${repoOwner}/${repoName}@master/${filePath}`
-            );
-            links = response.data;
-            displayLinks();
-        } catch (error) {
-            console.error('Failed to fetch links:', error);
-            showError('获取链接失败，请重试: ' + error.message);
+        function authenticate() {
+            const passwordInput = document.getElementById('passwordInput').value;
+            if (passwordInput === password) {
+                localStorage.setItem('authStatus', 'true');
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('linksSection').style.display = 'block';
+                fetchLinks();
+            } else {
+                showError('密码错误');
+            }
         }
-    }
 
-    function displayLinks() {
-        const linksList = document.getElementById('linksList');
-        linksList.innerHTML = '';
-        for (const [shortUrl, link] of Object.entries(links)) {
+        async function fetchLinks() {
+            try {
+                const response = await axios.get(
+                    `https://cdn.jerryz.com.cn/gh/$${repoOwner}/$${repoName}@master/$${filePath}`
+                );
+                links = response.data;
+                displayLinks();
+            } catch (error) {
+                console.error('Failed to fetch links:', error);
+                showError('获取链接失败，请重试: ' + error.message);
+            }
+        }
+
+        function displayLinks() {
+            const linksList = document.getElementById('linksList');
+            linksList.innerHTML = '';
+            for (const [shortUrl, link] of Object.entries(links)) {
+                const linkItem = document.createElement('div');
+                linkItem.className = 'link-item';
+                linkItem.innerHTML = `
+                    <input value="$${shortUrl}" onchange="updateShortUrl('$${shortUrl}', this.value)" placeholder="短链接">
+                    <input value="$${link}" onchange="updateLink('$${shortUrl}', this.value)" placeholder="链接">
+                    <button onclick="removeLink('$${shortUrl}')"><i class="fas fa-trash"></i></button>
+                `;
+                linksList.appendChild(linkItem);
+            }
+        }
+
+        function addLink() {
             const linkItem = document.createElement('div');
             linkItem.className = 'link-item';
             linkItem.innerHTML = `
-                <input value="${shortUrl}" onchange="updateShortUrl('${shortUrl}', this.value)" placeholder="新短链接">
-                <input value="${link}" onchange="updateLink('${shortUrl}', this.value)" placeholder="新链接">
-                <button onclick="removeLink('${shortUrl}')"><i class="fas fa-trash"></i></button>
+                <input placeholder="短链接" onchange="updateShortUrl('', this.value)">
+                <input placeholder="链接" onchange="updateLink('', this.value)">
+                <button onclick="removeLink('')"><i class="fas fa-trash"></i></button>
             `;
-            linksList.appendChild(linkItem);
+            document.getElementById('linksList').appendChild(linkItem);
         }
-    }
 
-    function addLink() {
-        const linkItem = document.createElement('div');
-        linkItem.className = 'link-item';
-        linkItem.innerHTML = `
-            <input placeholder="新短链接" onchange="updateNewLink(this, 'shortUrl')">
-            <input placeholder="新链接" onchange="updateNewLink(this, 'link')">
-            <button onclick="removeLink('new')"><i class="fas fa-trash"></i></button>
-        `;
-        document.getElementById('linksList').appendChild(linkItem);
-    }
-
-    function updateNewLink(inputElement, type) {
-        const linkItem = inputElement.parentNode;
-        const shortUrlInput = linkItem.querySelector('input[placeholder="新短链接"]');
-        const linkInput = linkItem.querySelector('input[placeholder="新链接"]');
-        const shortUrl = shortUrlInput.value;
-        const link = linkInput.value;
-
-        if (shortUrl && link) {
-            links[shortUrl] = link;
-            displayLinks();
-        }
-    }
-
-    function updateShortUrl(oldShortUrl, newShortUrl) {
-        if (oldShortUrl !== newShortUrl) {
-            links[newShortUrl] = links[oldShortUrl];
-            delete links[oldShortUrl];
-            displayLinks();
-        }
-    }
-
-    function updateLink(shortUrl, newLink) {
-        links[shortUrl] = newLink;
-    }
-
-    function removeLink(shortUrl) {
-        delete links[shortUrl];
-        displayLinks();
-    }
-
-    async function saveLinks() {
-        try {
-            const content = btoa(JSON.stringify(links, null, 2));
-            const response = await axios.put(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
-                message: 'Update links',
-                content: content,
-                sha: await getCurrentFileSHA()
-            }, {
-                headers: { 'Authorization': `token ${githubToken}` }
-            });
-
-            if (response.status === 200) {
-                alert('链接已保存到GitHub');
-            } else {
-                throw new Error('Failed to save links');
+        function updateShortUrl(oldShortUrl, newShortUrl) {
+            if (oldShortUrl !== newShortUrl) {
+                links[newShortUrl] = links[oldShortUrl];
+                delete links[oldShortUrl];
+                displayLinks();
             }
-        } catch (error) {
-            console.error('Failed to save links:', error);
-            showError('保存链接失败，请重试: ' + error.message);
         }
-    }
 
-    async function getCurrentFileSHA() {
-        try {
-            const response = await axios.get(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
-                headers: { 'Authorization': `token ${githubToken}` }
-            });
-            return response.data.sha;
-        } catch (error) {
-            console.error('Failed to get current file SHA:', error);
-            throw error;
+        function updateLink(shortUrl, newLink) {
+            links[shortUrl] = newLink;
         }
-    }
 
-    function showError(message) {
-        const errorElement = document.getElementById('errorMessage');
-        errorElement.textContent = message;
-    }
+        function removeLink(shortUrl) {
+            delete links[shortUrl];
+            displayLinks();
+        }
 
-    // 页面加载时检查认证状态
-    window.onload = checkAuth;
-</script>
+        async function saveLinks() {
+            try {
+                const content = btoa(JSON.stringify(links, null, 2));
+                const response = await axios.put(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
+                    message: 'Update links',
+                    content: content,
+                    sha: await getCurrentFileSHA()
+                }, {
+                    headers: { 'Authorization': `token $${githubToken}` }
+                });
+
+                if (response.status === 200) {
+                    alert('链接已保存到GitHub');
+                } else {
+                    throw new Error('Failed to save links');
+                }
+            } catch (error) {
+                console.error('Failed to save links:', error);
+                showError('保存链接失败，请重试: ' + error.message);
+            }
+        }
+
+        async function getCurrentFileSHA() {
+            try {
+                const response = await axios.get(`https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`, {
+                    headers: { 'Authorization': `token $${githubToken}` }
+                });
+                return response.data.sha;
+            } catch (error) {
+                console.error('Failed to get current file SHA:', error);
+                throw error;
+            }
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+        }
+
+        // 页面加载时检查认证状态
+        window.onload = checkAuth;
+    </script>
 </body>
 </html>
