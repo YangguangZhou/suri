@@ -309,26 +309,35 @@
         }
 
         async function saveLinks() {
-            try {
-                const content = btoa(JSON.stringify(links, null, 2));
-                const response = await axios.put(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
-                    message: 'Update links',
-                    content: content,
-                    sha: await getCurrentFileSHA()
-                }, {
-                    headers: { 'Authorization': `token ${githubToken}` }
-                });
+    try {
+        const content = btoa(JSON.stringify(links, null, 2));
+        const currentSHA = await getCurrentFileSHA();  // 获取当前文件的 SHA
 
-                if (response.status === 200) {
-                    alert('链接已保存到GitHub');
-                } else {
-                    throw new Error('Failed to save links');
-                }
-            } catch (error) {
-                console.error('Failed to save links:', error);
-                showError('保存链接失败，请重试: ' + error.message);
+        const response = await axios.put(
+            `https://api.github.com/repos/$${repoOwner}/$${repoName}/contents/$${filePath}`,
+            {
+                message: 'Update links',
+                content: content,
+                sha: currentSHA  // 使用获取到的 SHA
+            },
+            {
+                headers: { 'Authorization': `token $${githubToken}` }
             }
+        );
+
+        if (response.status === 200) {
+            alert('链接已保存到GitHub');
+        } else {
+            throw new Error('Failed to save links');
         }
+    } catch (error) {
+        console.error('Failed to save links:', error);
+        if (error.response) {
+            console.error('Error response:', error.response.data);
+        }
+        showError('保存链接失败，请重试: ' + error.message);
+    }
+}
 
         async function getCurrentFileSHA() {
             try {
